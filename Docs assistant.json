@@ -1,0 +1,156 @@
+{
+  "name": "Docs assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Upload policy docs",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Docs",
+              "fieldType": "file",
+              "acceptFileTypes": ".md",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bdfe2efc-0029-4d4f-9bff-d92900bd8fb3",
+      "name": "On form submission",
+      "webhookId": "9ea284bd-a760-4aeb-8c6a-8c9452c874ab"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "value": "security_docs",
+          "mode": "list"
+        },
+        "clearStore": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.4,
+      "position": [
+        256,
+        0
+      ],
+      "id": "9af825ec-d9b7-4c0d-a46b-5a2e4c7b1c31",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        232,
+        232
+      ],
+      "id": "61021618-83be-441f-8f06-f59dc7b65661",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "oNhIXHWEfr3z5rin",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "loader": "textLoader",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        232
+      ],
+      "id": "49f7234f-35c6-4ec0-b276-8efa98165edf",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 50,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        440,
+        440
+      ],
+      "id": "317ea818-ee23-4dd1-ac09-e40d329e95d8",
+      "name": "Recursive Character Text Splitter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "42ffdeed-ac34-491f-a0b5-010db2463810",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "735be1a99030efc529023806bb659de665334071f59eedc3c8d54cd0eade486c"
+  },
+  "nodeGroups": [],
+  "id": "EEUByUReDtpfTg99",
+  "tags": []
+}
